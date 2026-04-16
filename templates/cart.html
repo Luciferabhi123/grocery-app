@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cart</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Your Cart</h2>
+
+    {% for item in items %}
+        <div class="card">
+            <h3>{{item.name}}</h3>
+            <p>₹ {{item.price}}</p>
+
+            <a href="/update_cart/{{item.id}}/inc">+</a>
+            <span>{{item.qty}}</span>
+            <a href="/update_cart/{{item.id}}/dec">-</a>
+
+            <p>Subtotal: ₹ {{item.subtotal}}</p>
+        </div>
+    {% endfor %}
+
+    <h3>Total: ₹ {{total}}</h3>
+
+    <a href="/place_order"><button>Place Order</button></a>
+    <a href="/products"><button>Back</button></a>
+    <button onclick="payNow()">Pay Now</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+function payNow() {
+    fetch("/create_payment", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: "amount={{total}}"
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        var options = {
+            "key": "YOUR_KEY_ID",
+            "amount": "{{total}}" * 100,
+            "currency": "INR",
+            "name": "Grocery App",
+            "order_id": data.id,
+
+            "handler": function (response){
+                alert("Payment Successful!");
+                window.location.href = "/place_order";
+            }
+        };
+
+        var rzp = new Razorpay(options);
+        rzp.open();
+    });
+}
+</script>
+</div>
+
+</body>
+</html>

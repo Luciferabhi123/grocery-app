@@ -1,0 +1,51 @@
+<h3>Live Orders</h3>
+
+<div id="orders"></div>
+
+<audio id="alertSound" src="https://www.soundjay.com/buttons/sounds/beep-01a.mp3"></audio>
+
+<script>
+let lastOrderId = 0;
+
+function loadOrders() {
+    fetch("/api/orders")
+    .then(res => res.json())
+    .then(data => {
+
+        let html = "";
+
+        // first load fix
+        if (lastOrderId === 0 && data.length > 0) {
+            lastOrderId = data[0].id;
+        }
+
+        data.forEach(o => {
+
+            html += `
+                <div class="card">
+                    ${o.user} | ${o.product} | Qty: ${o.qty} | ₹ ${o.total}
+                    <br>
+                    Status: <b>${o.status}</b>
+                    <br>
+
+                    <a href="/update_status/${o.id}/Preparing">Preparing</a> |
+                    <a href="/update_status/${o.id}/Out for Delivery">Out</a> |
+                    <a href="/update_status/${o.id}/Delivered">Delivered</a>
+                </div>
+            `;
+
+            // new order alert
+            if (o.id > lastOrderId) {
+                document.getElementById("alertSound").play();
+                alert("🆕 New Order from " + o.user);
+                lastOrderId = o.id;
+            }
+        });
+
+        document.getElementById("orders").innerHTML = html;
+    });
+}
+
+setInterval(loadOrders, 3000);
+loadOrders();
+</script>

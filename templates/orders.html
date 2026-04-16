@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Orders</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Your Orders (Live Tracking)</h2>
+
+    <div id="orders"></div>
+</div>
+
+<script>
+function loadOrders() {
+    fetch("/api/orders")
+    .then(res => res.json())
+    .then(data => {
+
+        let html = "";
+
+        data.forEach(o => {
+            html += `
+                <div class="card">
+                    ${o.product} | Qty: ${o.qty} | ₹ ${o.total}
+                    <br>
+                    Status: <b>${o.status}</b>
+                </div>
+            `;
+        });
+
+        document.getElementById("orders").innerHTML = html;
+    });
+}
+
+// auto refresh
+setInterval(loadOrders, 3000);
+loadOrders();
+</script>
+
+</body>
+</html>
