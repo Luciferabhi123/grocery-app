@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, session, jsonify
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -9,13 +10,16 @@ app.secret_key = "secret123"
 razorpay_client = razorpay.Client(auth=("YOUR_KEY_ID", "YOUR_SECRET"))
 
 # ================= DATABASE =================
+
 def connect_db():
     return sqlite3.connect("database.db")
 
 def create_tables():
+
     con = connect_db()
     cur = con.cursor()
 
+    # USERS TABLE
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,14 +29,17 @@ def create_tables():
         )
     """)
 
+    # PRODUCTS TABLE
     cur.execute("""
         CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            price INTEGER
-        )
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    price INTEGER,
+    image TEXT DEFAULT ''
+)
     """)
 
+    # ORDERS TABLE
     cur.execute("""
         CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,6 +55,7 @@ def create_tables():
     con.close()
 
 create_tables()
+
 
 # ================= API =================
 
